@@ -10,24 +10,24 @@ typedef struct{
 
 void merge(int data[], int low, int mid, int high){
 	// split data into left and right sections
-	// NOTE: mid is the last element of the left array
+	// NOTE: mid is the index of the last element of the left array
 	int size_left  = mid - low + 1;
 	int size_right = high - mid;
 
-	int *left  = new int[size_left];
+	int *left = new int[size_left];
 	int *right = new int[size_right];
 
 	int i, j;
 	for(i = 0; i < size_left; i++)
-		left[i]  = data[low + i];
-	// at this point, i is the index after the last element in left
+		left[i] = data[low + i];
+	// at this point, low+i is the index after the last element in left
 	// i.e. the first element of right
-	for(j = i; j <= high; j++)
-		right[j-i] = data[j];
+	for(j = 0; j < size_right; j++)
+		right[j] = data[mid + j + 1];
 
 	// fill data with the minimum elements from left and right in order
-	i = j = 0;
-	int n = 0; // current position in original data array
+	i = j = 0; // current position in left and right respectively
+	int n = low; // current position in original data array
 	while(i < size_left && j < size_right){
 		if(left[i] < right[j])
 			data[n++] = left[i++];
@@ -40,7 +40,7 @@ void merge(int data[], int low, int mid, int high){
 	// include the rest of the right array
 	while(j < size_right)
 		data[n++] = right[j++];
-	
+
 	delete[] left;
 	delete[] right;
 }
@@ -124,13 +124,20 @@ void print_arr(int *arr, int n){
 }
 
 int main(){
-	int arr[10] = {6, 34, 2, 10, 11, 42, 23, 81, 34, 67};
-
+	int arr[10] = {6, 34, 2, 10, 11, 42, 23, 81, 36, 67};
 	print_arr(arr, 10);
-
 	merge_sort(arr, 10, 2);
-
 	print_arr(arr, 10);
+	/*
+	int arr[10] = {4, 20, 99, 10, 11, 1, 21, 55, 42, 69};
+	print_arr(arr, 10);
+	merge(arr, 0, 2, 4);
+	print_arr(arr, 10);
+	merge(arr, 5, 7, 9);
+	print_arr(arr, 10);
+	merge(arr, 0, 4, 9);
+	print_arr(arr, 10);
+	*/
 
 	return 0;
 }
