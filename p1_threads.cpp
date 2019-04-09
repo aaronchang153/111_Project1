@@ -2,10 +2,6 @@
 
 #define AVG(a, b) (((a) + (b)) / 2)
 
-// This file includes functions that actually perform the
-// computation. You can create a thread with these function
-// or directly call this function
-
 typedef struct{
 	int *data;
 	int start;
@@ -13,6 +9,7 @@ typedef struct{
 } merge_sort_thread_args;
 
 void merge(int data[], int low, int mid, int high){
+	// split data into left and right sections
 	int size_left  = mid - low + 1;
 	int size_right = high - mid;
 
@@ -25,6 +22,7 @@ void merge(int data[], int low, int mid, int high){
 	for(j = 0; j < size_right; j++)
 		right[i] = data[mid + j + 1];
 
+	// fill data with the minimum elements from left and right in order
 	i = j = 0;
 	int n = 0; // current position in original data array
 	while(i < size_left && j < size_right){
@@ -33,13 +31,24 @@ void merge(int data[], int low, int mid, int high){
 		else
 			data[n++] = right[j++];
 	}
+	// include the rest of the left array
 	while(i < size_left)
 		data[n++] = left[i++];
+	// include the rest of the right array
 	while(j < size_right)
 		data[n++] = right[j++];
 	
 	delete[] left;
 	delete[] right;
+}
+
+void merge_threads(int data[], merge_sort_thread_args *args, int start, int end){
+	if((end - start) > 1){
+		int mid = AVG(start, end);
+		merge_threads(data, args, start, mid);
+		merge_threads(data, args, mid+1, end);
+	}
+	merge(data, args[start].start, AVG(args[start].start, args[end].end), args[end].end);
 }
 
 void *merge_sort_thread(void *argp){
@@ -76,6 +85,8 @@ int merge_sort(int data[], int length, int max_threads){
 	// compute the start and end points of each segment
 	int i;
 	merge_sort_thread_args args[num_threads];
+	for(i = 0; i < num_threads; i++)
+		args[i].data = data;
 	args[0].start = 0;
 	args[0].end = sub_array_size - 1;
 	for(i = 1; i < num_threads - 1; i++){
@@ -94,4 +105,31 @@ int merge_sort(int data[], int length, int max_threads){
 	}
 
 	// merge the sorted segments of the array
+	merge_threads(data, args, 0, num_threads - 1);
+
+	return 0;
 }
+
+#ifdef MERGE_SORT_TEST
+
+void print_arr(int *arr, int n){
+	printf("{");
+	for(int i = 0; i < n; i++){
+		printf("%d ", arr[i]);
+	}
+	printf("}\n");
+}
+
+int main(){
+	int arr[10] = {6, 34, 2, 10, 11, 42, 23, 81, 34, 67};
+
+	print_arr(arr, 10);
+
+	merge_sort(arr, 10, 2);
+
+	print_arr(arr, 10);
+
+	return 0;
+}
+
+#endif // MERGE_SORT_TEST
