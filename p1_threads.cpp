@@ -10,6 +10,7 @@ typedef struct{
 
 void merge(int data[], int low, int mid, int high){
 	// split data into left and right sections
+	// NOTE: mid is the last element of the left array
 	int size_left  = mid - low + 1;
 	int size_right = high - mid;
 
@@ -19,8 +20,10 @@ void merge(int data[], int low, int mid, int high){
 	int i, j;
 	for(i = 0; i < size_left; i++)
 		left[i]  = data[low + i];
-	for(j = 0; j < size_right; j++)
-		right[i] = data[mid + j + 1];
+	// at this point, i is the index after the last element in left
+	// i.e. the first element of right
+	for(j = i; j <= high; j++)
+		right[j-i] = data[j];
 
 	// fill data with the minimum elements from left and right in order
 	i = j = 0;
