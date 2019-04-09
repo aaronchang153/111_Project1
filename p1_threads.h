@@ -9,6 +9,6 @@
 
 #include "p1_process.h"
 
-
+int merge_sort(int data[], int length, int num_threads);
 
 #endif
