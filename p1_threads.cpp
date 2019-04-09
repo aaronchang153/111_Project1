@@ -1,5 +1,7 @@
 #include "p1_threads.h"
 
+#define AVG(a, b) (((a) + (b)) / 2)
+
 // This file includes functions that actually perform the
 // computation. You can create a thread with these function
 // or directly call this function
@@ -47,7 +49,7 @@ void *merge_sort_thread(void *argp){
 	if(args->start < args->end){
 		merge_sort_thread_args arg1, arg2;
 
-		int mid = (args->start + args->end) / 2;
+		int mid = AVG(args->start, args->end);
 
 		arg1.data = arg2.data = args->data;
 
@@ -64,4 +66,32 @@ void *merge_sort_thread(void *argp){
 	return NULL;
 }
 
-int merge_sort(int data[], int length, int num_threads);
+int merge_sort(int data[], int length, int max_threads){
+	int num_threads = (max_threads > length) ? length : max_threads;
+
+	pthread_t threads[num_threads];
+	int sub_array_size = length / max_threads;
+
+	// divide the array into "num_threads" number of segments and 
+	// compute the start and end points of each segment
+	int i;
+	merge_sort_thread_args args[num_threads];
+	args[0].start = 0;
+	args[0].end = sub_array_size - 1;
+	for(i = 1; i < num_threads - 1; i++){
+		args[i].start = args[i-1].end + 1;
+		args[i].end   = args[i].start + sub_array_size - 1;
+	}
+	args[num_threads-1].start = args[num_threads-2].end + 1;
+	args[num_threads-1].end = length - 1;
+
+	// create threads to sort each segment
+	for(i = 0; i < num_threads; i++){
+		pthread_create(&threads[i], NULL, merge_sort_thread, (void *) &args[i]);
+	}
+	for(i = 0; i < num_threads; i++){
+		pthread_join(threads[i], NULL);
+	}
+
+	// merge the sorted segments of the array
+}
