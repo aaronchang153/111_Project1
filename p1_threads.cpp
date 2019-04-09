@@ -45,15 +45,25 @@ void merge(int data[], int low, int mid, int high){
 	delete[] right;
 }
 
+// merges each of the sorted segments of the original data array
 void merge_threads(int data[], merge_sort_thread_args *args, int start, int end){
-	if((end - start) > 1){
+	// start and end refer to segments of the original array that were sorted by each thread
+	if((end - start) == 1){ // base case: merge two segments together
+		merge(data, args[start].start, args[start].end, args[end].end);
+	}
+	else if((end - start) == 2){ // almost base case: merge three segments together
+		merge_threads(data, args, start, start + 1);
+		merge(data, args[start].start, args[start+1].end, args[end].end);
+	}
+	else{ // recursive case
 		int mid = AVG(start, end);
 		merge_threads(data, args, start, mid);
 		merge_threads(data, args, mid+1, end);
+		merge(data, args[start].start, args[mid].end, args[end].end);
 	}
-	merge(data, args[start].start, AVG(args[start].start, args[end].end), args[end].end);
 }
 
+// recursive merge sort run by each thread
 void *merge_sort_thread(void *argp){
 	// might need to go back and trace which array the midpoint is included in
 	merge_sort_thread_args *args = (merge_sort_thread_args *) argp;
@@ -79,6 +89,10 @@ void *merge_sort_thread(void *argp){
 }
 
 int merge_sort(int data[], int length, int max_threads){
+	if(max_threads < 1){
+		return -1;
+	}
+
 	int num_threads = (max_threads > length) ? length : max_threads;
 
 	pthread_t threads[num_threads];
@@ -92,12 +106,15 @@ int merge_sort(int data[], int length, int max_threads){
 		args[i].data = data;
 	args[0].start = 0;
 	args[0].end = sub_array_size - 1;
-	for(i = 1; i < num_threads - 1; i++){
-		args[i].start = args[i-1].end + 1;
-		args[i].end   = args[i].start + sub_array_size - 1;
+	if(num_threads > 1){
+		// this only needs to be done if there's more than one thread
+		for(i = 1; i < num_threads - 1; i++){
+			args[i].start = args[i-1].end + 1;
+			args[i].end   = args[i].start + sub_array_size - 1;
+		}
+		args[num_threads-1].start = args[num_threads-2].end + 1;
+		args[num_threads-1].end = length - 1;
 	}
-	args[num_threads-1].start = args[num_threads-2].end + 1;
-	args[num_threads-1].end = length - 1;
 
 	// create threads to sort each segment
 	for(i = 0; i < num_threads; i++){
@@ -108,12 +125,30 @@ int merge_sort(int data[], int length, int max_threads){
 	}
 
 	// merge the sorted segments of the array
-	merge_threads(data, args, 0, num_threads - 1);
+	if(num_threads > 1){
+		// don't need to merge the results from each thread if there's only one thread
+		merge_threads(data, args, 0, num_threads - 1);
+	}
 
 	return 0;
 }
 
 #ifdef MERGE_SORT_TEST
+
+#include <time.h>
+
+#define SIZE 10
+#define MAX_NUM 100
+#define NUM_THREADS 2
+
+int check_sorted(int *arr, int n){
+	for(int i = 1; i < n; i++){
+		if(arr[i] < arr[i-1]){
+			return 0;
+		}
+	}
+	return 1;
+}
 
 void print_arr(int *arr, int n){
 	printf("{");
@@ -124,10 +159,20 @@ void print_arr(int *arr, int n){
 }
 
 int main(){
+	srand((unsigned) time(NULL));
+	int arr[SIZE];
+	for(int i = 0; i < SIZE; i++)
+		arr[i] = rand() % MAX_NUM;
+	print_arr(arr, SIZE);
+	merge_sort(arr, SIZE, NUM_THREADS);
+	print_arr(arr, SIZE);
+	
+	/*
 	int arr[10] = {6, 34, 2, 10, 11, 42, 23, 81, 36, 67};
 	print_arr(arr, 10);
 	merge_sort(arr, 10, 2);
 	print_arr(arr, 10);
+	*/
 	/*
 	int arr[10] = {4, 20, 99, 10, 11, 1, 21, 55, 42, 69};
 	print_arr(arr, 10);
@@ -138,6 +183,11 @@ int main(){
 	merge(arr, 0, 4, 9);
 	print_arr(arr, 10);
 	*/
+
+	if(check_sorted(arr, SIZE))
+		printf("SORTED\n");
+	else
+		printf("NOT SORTED\n");
 
 	return 0;
 }
