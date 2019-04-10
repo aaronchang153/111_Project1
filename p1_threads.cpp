@@ -93,7 +93,7 @@ int merge_sort(DATA_VECTOR *data, int max_threads){
 	int num_threads = (max_threads > length) ? length : max_threads;
 
 	pthread_t threads[num_threads];
-	int sub_array_size = length / max_threads;
+	int sub_array_size = length / num_threads;
 
 	// divide the array into "num_threads" number of segments and 
 	// compute the start and end points of each segment
