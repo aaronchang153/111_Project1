@@ -8,7 +8,10 @@
 #include <pthread.h>
 
 #include "p1_process.h"
+#include "csv.h"
 
-int merge_sort(int data[], int length, int num_threads);
+typedef std::vector<student_data> DATA_VECTOR;
+
+int merge_sort(DATA_VECTOR *data, int num_threads);
 
 #endif
