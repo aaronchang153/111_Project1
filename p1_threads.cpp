@@ -132,6 +132,8 @@ int merge_sort(DATA_VECTOR *data, int max_threads){
 
 #ifdef MERGE_SORT_TEST
 
+#include "csv.h"
+#include <iostream>
 #include <time.h>
 
 #define SIZE 100
@@ -148,30 +150,32 @@ int check_sorted_vector(DATA_VECTOR v){
 }
 
 void print_vector(DATA_VECTOR v){
-	printf(">>> START\n");
+	std::cout << ">>> START" << std::endl;
 	for(int i = 0; i < v.size(); i++){
-		printf("%10d\t%10f\n", v[i].studentID, v[i].grade);
+		std::cout << v[i].studentID << "," << v[i].grade << std::endl;
 	}
-	printf("<<< END\n\n");
+	std::cout << "<<< END" << std::endl;
 }
 
 int main(){
 	srand((unsigned) time(NULL));
-	DATA_VECTOR data;
+	DATA_VECTOR data = read_csv("input/algorithm.csv");
 	student_data entry;
+	/*
 	for(int i = 0; i < SIZE; i++){
 		entry.studentID = i;
 		entry.grade = (float) (rand() % MAX_NUM);
 		data.push_back(entry);
 	}
-	print_vector(data);
+	*/
+	//print_vector(data);
 	merge_sort(&data, NUM_THREADS);
 	print_vector(data);
 
 	if(check_sorted_vector(data))
-		printf("SORTED\n");
+		std::cout << "SORTED" << std::endl;
 	else
-		printf("NOT SORTED\n");
+		std::cout << "NOT SORTED" << std::endl;
 
 	return 0;
 }
