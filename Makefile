@@ -10,7 +10,10 @@ CFLAGS=-std=c++98 -I.
 	$(CC) -c $< $(CFLAGS)
 
 ${EXEC}: main.o p1_process.o p1_threads.o csv.o
-	g++ -o ${EXEC} main.o p1_process.o p1_threads.o -I. -lpthread 
+	g++ -o ${EXEC} main.o p1_process.o p1_threads.o csv.o -I. -lpthread 
+
+debug: CFLAGS+=-g
+debug: ${EXEC}
 
 
 ${MS_TEST}: CFLAGS+=-DMERGE_SORT_TEST -g
