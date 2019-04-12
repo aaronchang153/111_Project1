@@ -14,8 +14,8 @@ ${EXEC}: main.o p1_process.o p1_threads.o csv.o
 
 
 ${MS_TEST}: CFLAGS+=-DMERGE_SORT_TEST -g
-${MS_TEST}: p1_threads.o
-	g++ -o ${MS_TEST} p1_threads.o -I. -lpthread 
+${MS_TEST}: p1_threads.o csv.o
+	g++ -o ${MS_TEST} p1_threads.o csv.o -I. -lpthread 
 
 ${CSV_TEST}: CFLAGS+=-DCSV_TEST -g
 ${CSV_TEST}: csv.o
