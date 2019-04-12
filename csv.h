@@ -5,7 +5,7 @@
 #include <vector>
 
 typedef struct{
-    int studentID;
+    std::string studentID;
     float grade;
 } student_data;
 
