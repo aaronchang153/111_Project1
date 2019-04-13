@@ -50,7 +50,7 @@ int write_csv(std::string fname, std::vector<student_data> data){
     fprintf(fp, "Rank,Student ID,Grade\n");
     int rank = 1;
     for(int i = data.size() - 1; i >= 0; i--){
-        fprintf(fp, "%d,%s,%.10lf\n", rank++, data[i].studentID.c_str(), data[i].grade);
+        fprintf(fp, "%d,%s,%.10lg\n", rank++, data[i].studentID.c_str(), data[i].grade);
     }
     fclose(fp);
     return 0;
@@ -64,7 +64,7 @@ int write_stats_csv(std::string fname, stats_t stats){
     }
     
     fprintf(fp, "Average,Median,Std. Dev\n");
-    fprintf(fp, "%lf,%lf,%lf\n", stats.avg, stats.med, stats.std_dev);
+    fprintf(fp, "%.10lg,%.10lg,%.10lg\n", stats.avg, stats.med, stats.std_dev);
     fclose(fp);
     return 0;
 }
