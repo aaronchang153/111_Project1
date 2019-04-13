@@ -1,5 +1,8 @@
 #include "csv.h"
 
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -40,33 +43,23 @@ std::vector<student_data> read_csv(std::string fname){
     return data;
 }
 
-int write_csv(std::string fname, std::vector<student_data> data){
-    FILE *fp = NULL;
-    fp = fopen(fname.c_str(), "w");
-    if(fp == NULL){
-        return -1;
-    }
-    
-    fprintf(fp, "Rank,Student ID,Grade\n");
+void write_csv(std::string fname, std::vector<student_data> data){
+    std::ofstream fs;
+    fs.open(fname.c_str());
+    fs << "Rank,Student ID,Grade\n";
     int rank = 1;
     for(int i = data.size() - 1; i >= 0; i--){
-        fprintf(fp, "%d,%s,%.10lg\n", rank++, data[i].studentID.c_str(), data[i].grade);
+        fs << rank++ << "," << data[i].studentID << "," << std::setprecision(12) << data[i].grade << "\n";
     }
-    fclose(fp);
-    return 0;
+    fs.close();
 }
 
-int write_stats_csv(std::string fname, stats_t stats){
-    FILE *fp = NULL;
-    fp = fopen(fname.c_str(), "w");
-    if(fp == NULL){
-        return -1;
-    }
-    
-    fprintf(fp, "Average,Median,Std. Dev\n");
-    fprintf(fp, "%.10lg,%.10lg,%.10lg\n", stats.avg, stats.med, stats.std_dev);
-    fclose(fp);
-    return 0;
+void write_stats_csv(std::string fname, stats_t stats){
+    std::ofstream fs;
+    fs.open(fname.c_str());
+    fs << "Average,Median,Std. Dev\n";
+    fs << std::setprecision(5) << stats.avg << "," << stats.med << "," << stats.std_dev << "\n";
+    fs.close();
 }
 
 
