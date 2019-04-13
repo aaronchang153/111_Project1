@@ -17,8 +17,8 @@ typedef struct{
 
 std::vector<student_data> read_csv(std::string fname);
 
-int write_csv(std::string fname, std::vector<student_data> data);
+void write_csv(std::string fname, std::vector<student_data> data);
 
-int write_stats_csv(std::string fname, stats_t stats);
+void write_stats_csv(std::string fname, stats_t stats);
 
 #endif // CSV_H
