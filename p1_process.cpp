@@ -42,15 +42,16 @@ void get_statistics(std::string class_name[], int num_processes, int num_threads
 			process_count++;
 		}
 		else if(fork_id == 0){ // if this is the child process
-			int work_amount = (i == num_processes - 1) ? NUM_FILES - num_processes + 1 : 1;
-			// if this is the last process to be created, it need to handle the rest of the files
-			// else just handle one file
-			for(int j = 0; j < work_amount; j++){
-				std::vector<student_data> data = read_csv("input/" + class_name[i+j] + ".csv");
+			// at this point i is the index of the first file that this process needs to work on
+			int files_completed = 0;
+			int current_file_num;
+			while((current_file_num = i + (num_processes * files_completed)) < NUM_FILES){
+				std::vector<student_data> data = read_csv("input/" + class_name[current_file_num] + ".csv");
 				merge_sort(&data, num_threads);
-				write_csv("output/" + class_name[i+j] + "_sorted.csv", data);
+				write_csv("output/" + class_name[current_file_num] + "_sorted.csv", data);
 				stats_t stats = calculate_stats(data);
-				write_stats_csv("output/" + class_name[i+j] + "_stats.csv", stats);
+				write_stats_csv("output/" + class_name[current_file_num] + "_stats.csv", stats);
+				files_completed++;
 			}
 			exit(0);
 		}
