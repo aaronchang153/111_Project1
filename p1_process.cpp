@@ -10,14 +10,20 @@ static inline double square(double x) { return x * x; }
 
 stats_t calculate_stats(std::vector<student_data> data){
 	stats_t stats;
-	stats.med = data[data.size() / 2].grade;
+	// calculate median
+	if(data.size() % 2 == 0)
+		stats.med = (data[data.size() / 2].grade + data[(data.size() / 2) - 1].grade) / 2;
+	else
+		stats.med = data[data.size() / 2].grade;
 
+	// calculate average
 	double total = 0;
 	for(std::vector<student_data>::iterator it = data.begin(); it != data.end(); it++){
 		total = total + (*it).grade;
 	}
 	stats.avg = total / data.size();
 
+	// calculate standard deviation
 	total = 0; // reuse total variable for standard deviation
 	for(std::vector<student_data>::iterator it = data.begin(); it != data.end(); it++){
 		total = total + square((*it).grade - stats.avg);
