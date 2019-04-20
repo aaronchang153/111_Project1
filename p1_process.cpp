@@ -63,6 +63,8 @@ void get_statistics(std::string class_name[], int num_processes, int num_threads
 		}
 	}
 
+	printf("Waiting for child processes to terminate...\n");
+
 	while(process_count > 0){
 		fork_id = wait(NULL);
 		printf("Child process is terminated. (pid: %d)\n", fork_id);
